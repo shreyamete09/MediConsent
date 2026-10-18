@@ -1,0 +1,61 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 2354 >>
+stream
+BT /F1 16 Tf 50 720 Td (CARDIAC DIAGNOSTIC CENTER - ECHOCARDIOGRAM REPORT) Tj ET
+BT /F1 10 Tf 50 700 Td (SAMPLE DATA - NOT REAL MEDICAL RECORD - SYNTHETIC DEMO ONLY) Tj ET
+BT /F1 10 Tf 50 685 Td (========================================================================) Tj ET
+BT /F1 10 Tf 50 665 Td (PATIENT: Alice Walker \(DEMO SYNTHETIC PATIENT\)) Tj ET
+BT /F1 10 Tf 50 649 Td (RECORD CATEGORY: Cardiology \(Transthoracic Echocardiogram\)) Tj ET
+BT /F1 10 Tf 50 633 Td (FACILITY: City Memorial Hospital - Heart Institute) Tj ET
+BT /F1 10 Tf 50 617 Td (DATE: 2026-10-13 14:00 UTC) Tj ET
+BT /F1 10 Tf 50 601 Td () Tj ET
+BT /F1 10 Tf 50 585 Td (ECHOCARDIOGRAPHIC FINDINGS:) Tj ET
+BT /F1 10 Tf 50 569 Td (----------------------------------------------------------------------) Tj ET
+BT /F1 10 Tf 50 553 Td (1. Left Ventricle \(LV\):) Tj ET
+BT /F1 10 Tf 50 537 Td (   - Normal cavity dimensions. LVEDD: 4.8 cm, LVESD: 3.1 cm.) Tj ET
+BT /F1 10 Tf 50 521 Td (   - Normal wall thickness. Interventricular septum: 0.9 cm.) Tj ET
+BT /F1 10 Tf 50 505 Td (   - Preserved left ventricular systolic function.) Tj ET
+BT /F1 10 Tf 50 489 Td (   - Estimated Left Ventricular Ejection Fraction \(LVEF\): 62% \(Normal\).) Tj ET
+BT /F1 10 Tf 50 473 Td () Tj ET
+BT /F1 10 Tf 50 457 Td (2. Valvular Structure & Hemodynamics:) Tj ET
+BT /F1 10 Tf 50 441 Td (   - Mitral Valve: Structurally normal leaflets. Trivial regurgitation.) Tj ET
+BT /F1 10 Tf 50 425 Td (   - Aortic Valve: Trileaflet, opens well without stenosis. Peak velocity 1.2 m/s.) Tj ET
+BT /F1 10 Tf 50 409 Td (   - Tricuspid Valve: Normal structure, physiological regurgitation. PASP: 22 mmHg.) Tj ET
+BT /F1 10 Tf 50 393 Td () Tj ET
+BT /F1 10 Tf 50 377 Td (3. Pericardium & Great Vessels:) Tj ET
+BT /F1 10 Tf 50 361 Td (   - No pericardial effusion identified.) Tj ET
+BT /F1 10 Tf 50 345 Td (   - Ascending aorta normal caliber \(3.0 cm\). Inferior vena cava collapsibility >50%.) Tj ET
+BT /F1 10 Tf 50 329 Td () Tj ET
+BT /F1 10 Tf 50 313 Td (IMPRESSION:) Tj ET
+BT /F1 10 Tf 50 297 Td (  1. Normal biventricular size and systolic performance \(LVEF 62%\).) Tj ET
+BT /F1 10 Tf 50 281 Td (  2. No significant valvular pathology. No evidence of pulmonary hypertension.) Tj ET
+BT /F1 10 Tf 50 265 Td () Tj ET
+BT /F1 10 Tf 50 249 Td (ATTENDING CARDIOLOGIST: Dr. Marcus Vance, MD, FACC \(License #CARD-88312\)) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000002646 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2716
+%%EOF

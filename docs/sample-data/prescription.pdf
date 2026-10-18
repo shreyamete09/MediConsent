@@ -1,0 +1,53 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1580 >>
+stream
+BT /F1 16 Tf 50 720 Td (OUTPATIENT PRESCRIPTION ORDER) Tj ET
+BT /F1 10 Tf 50 700 Td (SAMPLE DATA - NOT REAL MEDICAL RECORD - SYNTHETIC DEMO ONLY) Tj ET
+BT /F1 10 Tf 50 685 Td (========================================================================) Tj ET
+BT /F1 10 Tf 50 665 Td (PATIENT: Alice Walker \(DEMO SYNTHETIC PATIENT\)) Tj ET
+BT /F1 10 Tf 50 649 Td (RECORD CATEGORY: General Medicine) Tj ET
+BT /F1 10 Tf 50 633 Td (FACILITY: City Memorial Hospital \(Demo Provider\)) Tj ET
+BT /F1 10 Tf 50 617 Td (DATE: 2026-10-14 10:15 UTC) Tj ET
+BT /F1 10 Tf 50 601 Td () Tj ET
+BT /F1 10 Tf 50 585 Td (Rx Orders:) Tj ET
+BT /F1 10 Tf 50 569 Td (----------------------------------------------------------------------) Tj ET
+BT /F1 10 Tf 50 553 Td (1. Amoxicillin / Clavulanate \(Augmentin\)) Tj ET
+BT /F1 10 Tf 50 537 Td (   Dosage: 875 mg / 125 mg oral tablet) Tj ET
+BT /F1 10 Tf 50 521 Td (   Sig: Take 1 tablet by mouth twice daily with meals for 10 days.) Tj ET
+BT /F1 10 Tf 50 505 Td (   Quantity: 20 tablets | Refills: 0) Tj ET
+BT /F1 10 Tf 50 489 Td () Tj ET
+BT /F1 10 Tf 50 473 Td (2. Fluticasone Propionate Nasal Spray) Tj ET
+BT /F1 10 Tf 50 457 Td (   Dosage: 50 mcg/actuation) Tj ET
+BT /F1 10 Tf 50 441 Td (   Sig: 1 spray per nostril once daily as needed for seasonal rhinitis.) Tj ET
+BT /F1 10 Tf 50 425 Td (   Quantity: 1 bottle \(16 g\) | Refills: 2) Tj ET
+BT /F1 10 Tf 50 409 Td () Tj ET
+BT /F1 10 Tf 50 393 Td (INSTRUCTIONS: Drink plenty of water. Complete full antibiotic course.) Tj ET
+BT /F1 10 Tf 50 377 Td (PHYSICIAN: Dr. Emily Chen, MD \(DEA #DEMO-771829\)) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001872 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1942
+%%EOF

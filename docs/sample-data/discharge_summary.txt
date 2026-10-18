@@ -1,0 +1,37 @@
+================================================================================
+PATIENT DISCHARGE SUMMARY - NOT REAL MEDICAL DATA - SYNTHETIC DEMO ONLY
+================================================================================
+PATIENT NAME:         Alice Walker
+RECORD ID (INTERNAL): MED-2026-9812
+FACILITY:             City Memorial Hospital
+DEPARTMENT:           Internal Medicine
+ADMISSION DATE:       2026-10-10 14:00 UTC
+DISCHARGE DATE:       2026-10-12 11:30 UTC
+ATTENDING PHYSICIAN:  Dr. R. Adams, MD
+
+PRIMARY DIAGNOSIS:
+  Mild Community-Acquired Bronchitis (Resolved)
+
+HOSPITAL COURSE:
+  Patient presented with mild productive cough, low-grade pyrexia (37.9 C),
+  and fatigue. Chest radiography performed on 2026-10-10 demonstrated clear
+  bilateral lung fields without consolidation, pleural effusion, or pneumothorax.
+  Laboratory blood indices were unremarkable. Patient was observed for 48 hours,
+  treated with supportive hydration and oral antibiotics, and showed complete
+  resolution of symptoms.
+
+DISCHARGE MEDICATIONS:
+  - Amoxicillin/Clavulanate 875/125mg PO BID x 10 days
+  - Paracetamol 500mg PO PRN for discomfort
+
+ACTIVITY & DIET:
+  - Normal diet as tolerated
+  - Resume light exercise as comfort permits
+
+FOLLOW-UP PLAN:
+  - Routine clinic review in 2 weeks with primary care physician.
+
+CONFIDENTIALITY NOTICE:
+  This document is synthetic demo data created for the MediConsent Hackathon.
+  No real patient information is contained in this document.
+================================================================================

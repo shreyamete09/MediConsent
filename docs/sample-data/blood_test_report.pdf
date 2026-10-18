@@ -1,0 +1,62 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 2561 >>
+stream
+BT /F1 16 Tf 50 720 Td (METRO CLINICAL LABORATORIES - BLOOD PANEL) Tj ET
+BT /F1 10 Tf 50 700 Td (SAMPLE DATA - NOT REAL MEDICAL RECORD - SYNTHETIC DEMO ONLY) Tj ET
+BT /F1 10 Tf 50 685 Td (========================================================================) Tj ET
+BT /F1 10 Tf 50 665 Td (PATIENT: Alice Walker \(DEMO SYNTHETIC PATIENT\)) Tj ET
+BT /F1 10 Tf 50 649 Td (RECORD CATEGORY: Pathology \(Blood Chemistry Panel\)) Tj ET
+BT /F1 10 Tf 50 633 Td (FACILITY: City Memorial Hospital \(Demo Provider\)) Tj ET
+BT /F1 10 Tf 50 617 Td (DATE: 2026-10-14 09:30 UTC) Tj ET
+BT /F1 10 Tf 50 601 Td () Tj ET
+BT /F1 10 Tf 50 585 Td (TEST NAME                 RESULT         REFERENCE RANGE      STATUS) Tj ET
+BT /F1 10 Tf 50 569 Td (----------------------------------------------------------------------) Tj ET
+BT /F1 10 Tf 50 553 Td (Complete Blood Count \(CBC\)) Tj ET
+BT /F1 10 Tf 50 537 Td (  Hemoglobin              14.2 g/dL      12.0 - 15.5 g/dL     NORMAL) Tj ET
+BT /F1 10 Tf 50 521 Td (  Hematocrit              41.5 %         37.0 - 48.0 %        NORMAL) Tj ET
+BT /F1 10 Tf 50 505 Td (  WBC \(White Blood Cells\) 6.4 x10^3/uL   4.5 - 11.0 x10^3/uL  NORMAL) Tj ET
+BT /F1 10 Tf 50 489 Td (  Platelets               245 x10^3/uL   150 - 450 x10^3/uL   NORMAL) Tj ET
+BT /F1 10 Tf 50 473 Td () Tj ET
+BT /F1 10 Tf 50 457 Td (Metabolic Panel) Tj ET
+BT /F1 10 Tf 50 441 Td (  Fasting Blood Glucose   92 mg/dL       70 - 99 mg/dL        NORMAL) Tj ET
+BT /F1 10 Tf 50 425 Td (  Serum Sodium            140 mEq/L      136 - 145 mEq/L      NORMAL) Tj ET
+BT /F1 10 Tf 50 409 Td (  Serum Potassium         4.2 mEq/L      3.5 - 5.0 mEq/L      NORMAL) Tj ET
+BT /F1 10 Tf 50 393 Td (  Serum Creatinine        0.8 mg/dL      0.6 - 1.2 mg/dL      NORMAL) Tj ET
+BT /F1 10 Tf 50 377 Td (  eGFR                    >90 mL/min     >60 mL/min           NORMAL) Tj ET
+BT /F1 10 Tf 50 361 Td () Tj ET
+BT /F1 10 Tf 50 345 Td (Lipid Panel) Tj ET
+BT /F1 10 Tf 50 329 Td (  Total Cholesterol       175 mg/dL      <200 mg/dL           OPTIMAL) Tj ET
+BT /F1 10 Tf 50 313 Td (  HDL \(Good\)              58 mg/dL       >50 mg/dL            OPTIMAL) Tj ET
+BT /F1 10 Tf 50 297 Td (  LDL \(Calculated\)        98 mg/dL       <100 mg/dL           OPTIMAL) Tj ET
+BT /F1 10 Tf 50 281 Td (  Triglycerides           95 mg/dL       <150 mg/dL           NORMAL) Tj ET
+BT /F1 10 Tf 50 265 Td () Tj ET
+BT /F1 10 Tf 50 249 Td (CONCLUSION: All laboratory indices are within established reference ranges.) Tj ET
+BT /F1 10 Tf 50 233 Td (PHYSICIAN SIGNATURE: Dr. R. Adams, MD \(License #DEMO-99214\)) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000002853 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2923
+%%EOF
