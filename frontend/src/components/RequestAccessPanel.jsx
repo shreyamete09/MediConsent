@@ -223,22 +223,22 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
   return (
     <div className="space-y-8">
       {/* ── Form: Request Access ───────────────────────────────────────────── */}
-      <div className="glass-panel rounded-2xl p-6 border border-slate-800 space-y-5">
-        <div>
-          <h2 className="text-lg font-bold text-white flex items-center space-x-2">
-            <Send className="w-5 h-5 text-blue-400" />
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="border-b border-slate-100 pb-4">
+          <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <Send className="w-5 h-5 text-teal-700" />
             <span>Request Patient Access</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-            Search for a patient address, select the clinical categories you need, and submit an on-chain
-            consent request. The patient must approve and wrap the encryption keys for your hospital before access is granted.
+          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+            Search for a patient address, select clinical categories, and submit an on-chain
+            consent request. The patient must approve and wrap keys for your hospital before access is granted.
           </p>
         </div>
 
         {/* Not registered warning */}
         {isHospitalRegistered === false && (
-          <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-xs text-rose-300 flex items-start space-x-2">
-            <ShieldAlert className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start space-x-2">
+            <ShieldAlert className="w-4 h-4 flex-shrink-0 mt-0.5 text-rose-600" />
             <span>
               Your wallet is not registered as a hospital on the smart contract. Access requests can only be sent by registered hospitals.
             </span>
@@ -248,7 +248,7 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
         <form onSubmit={handleRequestAccess} className="space-y-5">
           {/* Patient Search Input */}
           <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-300">
+            <label className="block text-xs font-semibold text-slate-700">
               Patient Wallet Address
             </label>
             <div className="flex space-x-2">
@@ -259,14 +259,14 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
                   value={patientInput}
                   onChange={(e) => setPatientInput(e.target.value.trim())}
                   disabled={isTxBusy || !isHospitalRegistered}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-600 text-xs font-mono focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-xs font-mono focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 disabled:opacity-50"
                 />
               </div>
               <button
                 type="button"
                 onClick={() => handleSearchPatient()}
                 disabled={isSearching || isTxBusy || !patientInput || !isHospitalRegistered}
-                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium flex items-center space-x-1.5 disabled:opacity-50 transition-colors"
+                className="px-5 py-2.5 rounded-xl bg-teal-800 hover:bg-teal-700 text-white text-xs font-semibold flex items-center space-x-1.5 disabled:opacity-50 transition-colors shadow-sm"
               >
                 <Search className={`w-3.5 h-3.5 ${isSearching ? "animate-spin" : ""}`} />
                 <span>{isSearching ? "Checking…" : "Lookup"}</span>
@@ -274,7 +274,7 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
             </div>
 
             {searchError && (
-              <p className="text-xs text-rose-400 flex items-center space-x-1">
+              <p className="text-xs text-rose-600 flex items-center space-x-1">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 <span>{searchError}</span>
               </p>
@@ -282,63 +282,63 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
 
             {/* Patient Name-less Summary Card */}
             {patientSummary && (
-              <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-700/80 space-y-2.5 animate-fadeIn">
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3 animate-fadeIn">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-slate-200 flex items-center space-x-1.5">
-                    <User className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="font-bold text-slate-900 flex items-center space-x-1.5">
+                    <User className="w-3.5 h-3.5 text-teal-700" />
                     <span>Patient Profile Summary</span>
                   </span>
-                  <span className="font-mono text-[10px] text-slate-400">
+                  <span className="font-mono text-[11px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
                     {patientSummary.address.slice(0, 10)}…{patientSummary.address.slice(-6)}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[11px]">
                   {/* Registration Status */}
-                  <div className="p-2 rounded-lg bg-slate-950/60 border border-slate-800 space-y-1">
-                    <span className="text-slate-400 block text-[10px]">On-Chain Registration</span>
+                  <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+                    <span className="text-slate-500 block text-[10px]">On-Chain Registration</span>
                     {patientSummary.isRegistered ? (
-                      <span className="inline-flex items-center space-x-1 text-emerald-400 font-semibold">
-                        <CheckCircle2 className="w-3 h-3" />
+                      <span className="inline-flex items-center space-x-1 text-emerald-700 font-semibold">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                         <span>Registered Patient</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center space-x-1 text-rose-400 font-semibold">
-                        <XCircle className="w-3 h-3" />
+                      <span className="inline-flex items-center space-x-1 text-rose-700 font-semibold">
+                        <XCircle className="w-3 h-3 text-rose-600" />
                         <span>Not Registered</span>
                       </span>
                     )}
                   </div>
 
                   {/* Public Key Status */}
-                  <div className="p-2 rounded-lg bg-slate-950/60 border border-slate-800 space-y-1">
-                    <span className="text-slate-400 block text-[10px]">RSA Public Key</span>
+                  <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+                    <span className="text-slate-500 block text-[10px]">RSA Public Key</span>
                     {patientSummary.hasPublicKey ? (
-                      <span className="inline-flex items-center space-x-1 text-emerald-400 font-semibold truncate">
-                        <KeyRound className="w-3 h-3 flex-shrink-0" />
-                        <span>Registered</span>
+                      <span className="inline-flex items-center space-x-1 text-emerald-700 font-semibold truncate">
+                        <KeyRound className="w-3 h-3 text-emerald-600 flex-shrink-0" />
+                        <span>Published</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center space-x-1 text-amber-400 font-semibold">
-                        <AlertTriangle className="w-3 h-3" />
+                      <span className="inline-flex items-center space-x-1 text-amber-700 font-semibold">
+                        <AlertTriangle className="w-3 h-3 text-amber-600" />
                         <span>Not Published</span>
                       </span>
                     )}
                   </div>
 
                   {/* Record Count */}
-                  <div className="p-2 rounded-lg bg-slate-950/60 border border-slate-800 space-y-1">
-                    <span className="text-slate-400 block text-[10px]">Uploaded Records</span>
-                    <span className="inline-flex items-center space-x-1 text-blue-300 font-semibold">
-                      <FileText className="w-3 h-3" />
+                  <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+                    <span className="text-slate-500 block text-[10px]">Uploaded Records</span>
+                    <span className="inline-flex items-center space-x-1 text-teal-800 font-semibold">
+                      <FileText className="w-3 h-3 text-teal-600" />
                       <span>{patientSummary.recordCount} Record(s)</span>
                     </span>
                   </div>
                 </div>
 
                 {!patientSummary.isRegistered && (
-                  <p className="text-[11px] text-rose-400">
-                    ⚠ This address has not registered on MediConsent. Requests will fail until the patient self-registers.
+                  <p className="text-[11px] text-rose-600 font-medium">
+                    ⚠ This address has not registered on MediConsent. Requests will fail until the patient registers.
                   </p>
                 )}
               </div>
@@ -348,10 +348,10 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
           {/* Record Type Selection */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-300">
+              <label className="block text-xs font-semibold text-slate-700">
                 Requested Record Categories (Select at least 1)
               </label>
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[11px] text-slate-500">
                 {selectedTypes.length} of {RECORD_TYPE_LABELS.length} selected
               </span>
             </div>
@@ -367,14 +367,14 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
                     disabled={isTxBusy || !isHospitalRegistered}
                     className={`flex items-center space-x-2 p-2.5 rounded-xl border text-left text-xs font-medium transition-all ${
                       isSelected
-                        ? "bg-blue-950/50 border-blue-500/50 text-blue-200 shadow-sm"
-                        : "bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700"
+                        ? "bg-teal-50 border-teal-300 text-teal-900 shadow-sm"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300"
                     } disabled:opacity-50`}
                   >
                     {isSelected ? (
-                      <CheckSquare className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                      <CheckSquare className="w-4 h-4 text-teal-700 flex-shrink-0" />
                     ) : (
-                      <Square className="w-4 h-4 text-slate-600 flex-shrink-0" />
+                      <Square className="w-4 h-4 text-slate-400 flex-shrink-0" />
                     )}
                     <span>{label}</span>
                   </button>
@@ -383,7 +383,7 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
             </div>
 
             {selectedTypes.length === 0 && (
-              <p className="text-[11px] text-rose-400">
+              <p className="text-[11px] text-rose-600 font-medium">
                 Please select at least one record category to request.
               </p>
             )}
@@ -402,7 +402,7 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
               !isHospitalRegistered ||
               !patientSummary?.isRegistered
             }
-            className="w-full flex items-center justify-center space-x-2 py-3 rounded-xl font-semibold text-xs text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            className="w-full flex items-center justify-center space-x-2 py-3 rounded-xl font-semibold text-xs sm:text-sm text-white bg-teal-800 hover:bg-teal-700 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           >
             <Send className="w-4 h-4" />
             <span>{isTxBusy ? "Submitting Request…" : "Submit Access Request"}</span>
@@ -411,17 +411,17 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
       </div>
 
       {/* ── Section: My Requests ───────────────────────────────────────────── */}
-      <div className="glass-panel rounded-2xl p-6 border border-slate-800 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center space-x-2">
-              <Clock className="w-5 h-5 text-blue-400" />
+            <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
+              <Clock className="w-5 h-5 text-teal-700" />
               <span>Outgoing Access Requests</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-500/30">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                 {requestEvents ? requestEvents.length : 0}
               </span>
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Live status of consent requests sent from this hospital wallet.
             </p>
           </div>
@@ -432,7 +432,7 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
               setRefreshTrigger((prev) => prev + 1);
             }}
             disabled={isRequestsLoading}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-900 border border-slate-700 text-slate-300 hover:text-white transition-colors disabled:opacity-50"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRequestsLoading ? "animate-spin" : ""}`} />
             <span>Refresh</span>
@@ -442,16 +442,16 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
         {/* Loading State */}
         {(isRequestsLoading || isResolvingStatuses) && (
           <div className="py-10 text-center space-y-2">
-            <RefreshCw className="w-6 h-6 text-blue-400 animate-spin mx-auto" />
-            <p className="text-xs text-slate-400">Loading access requests & deriving on-chain consent states…</p>
+            <RefreshCw className="w-6 h-6 text-teal-700 animate-spin mx-auto" />
+            <p className="text-xs text-slate-500">Loading access requests & deriving on-chain consent states…</p>
           </div>
         )}
 
         {/* Empty State */}
         {!isRequestsLoading && !isResolvingStatuses && (!requestEvents || requestEvents.length === 0) && (
-          <div className="glass-card rounded-xl p-8 text-center border border-slate-800 space-y-2">
-            <Clock className="w-8 h-8 text-slate-700 mx-auto" />
-            <h4 className="text-sm font-semibold text-slate-300">No Access Requests</h4>
+          <div className="rounded-2xl p-8 text-center border border-dashed border-slate-200 bg-slate-50/50 space-y-2">
+            <Clock className="w-8 h-8 text-slate-400 mx-auto" />
+            <h4 className="text-sm font-bold text-slate-800">No Access Requests</h4>
             <p className="text-xs text-slate-500 max-w-sm mx-auto">
               Your hospital has not submitted any access requests yet. Use the form above to search for a patient and request records.
             </p>
@@ -475,23 +475,23 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
               const badgeConfigs = {
                 pending: {
                   label: "Pending Patient Consent",
-                  bg: "bg-amber-950/70 border-amber-500/30 text-amber-300",
-                  icon: <Clock className="w-3.5 h-3.5" />,
+                  bg: "bg-amber-50 border-amber-200 text-amber-800",
+                  icon: <Clock className="w-3.5 h-3.5 text-amber-600" />,
                 },
                 approved: {
                   label: "Consent Approved",
-                  bg: "bg-emerald-950/70 border-emerald-500/30 text-emerald-300",
-                  icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+                  bg: "bg-emerald-50 border-emerald-200 text-emerald-800",
+                  icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />,
                 },
                 expired: {
                   label: "Consent Expired",
-                  bg: "bg-slate-900 border-slate-700 text-slate-400",
-                  icon: <AlertTriangle className="w-3.5 h-3.5" />,
+                  bg: "bg-slate-100 border-slate-200 text-slate-600",
+                  icon: <AlertTriangle className="w-3.5 h-3.5 text-slate-500" />,
                 },
                 revoked: {
                   label: "Consent Revoked",
-                  bg: "bg-rose-950/70 border-rose-500/30 text-rose-300",
-                  icon: <XCircle className="w-3.5 h-3.5" />,
+                  bg: "bg-rose-50 border-rose-200 text-rose-800",
+                  icon: <XCircle className="w-3.5 h-3.5 text-rose-600" />,
                 },
               };
 
@@ -500,7 +500,7 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
               return (
                 <div
                   key={evt.transactionHash + idx}
-                  className="glass-card rounded-xl p-4 border border-slate-800 space-y-3 hover:border-slate-700 transition-all"
+                  className="bg-slate-50 rounded-2xl p-5 border border-slate-200/90 space-y-3 shadow-sm hover:border-slate-300 transition-all"
                 >
                   {/* Top: Status Badge + Requested Date */}
                   <div className="flex items-center justify-between">
@@ -511,32 +511,32 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
                       <span>{currentBadge.label}</span>
                     </span>
 
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-[10px] text-slate-500 font-mono">
                       {timestampSec ? new Date(timestampSec * 1000).toLocaleDateString() : ""}
                     </span>
                   </div>
 
                   {/* Target Patient */}
-                  <div className="flex items-center justify-between text-xs bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/80">
-                    <span className="text-slate-400 flex items-center space-x-1.5">
-                      <User className="w-3.5 h-3.5 text-blue-400" />
+                  <div className="flex items-center justify-between text-xs bg-white p-2.5 rounded-xl border border-slate-200/70">
+                    <span className="text-slate-500 flex items-center space-x-1.5 font-sans">
+                      <User className="w-3.5 h-3.5 text-teal-700" />
                       <span>Target Patient:</span>
                     </span>
-                    <span className="font-mono text-slate-200 text-[11px]">
+                    <span className="font-mono text-slate-900 font-semibold text-[11px]">
                       {patientAddr.slice(0, 8)}…{patientAddr.slice(-6)}
                     </span>
                   </div>
 
                   {/* Requested Categories */}
                   <div className="space-y-1">
-                    <span className="text-[11px] text-slate-400 block font-medium">
+                    <span className="text-[11px] text-slate-500 block font-medium">
                       Requested Categories:
                     </span>
                     <div className="flex flex-wrap gap-1">
                       {types.map((t) => (
                         <span
                           key={t}
-                          className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800/90 text-slate-300 border border-slate-700"
+                          className="text-[10px] px-2 py-0.5 rounded-md bg-white text-slate-700 border border-slate-200 font-medium"
                         >
                           {recordTypeLabel(t)}
                         </span>
@@ -546,21 +546,21 @@ export default function RequestAccessPanel({ isHospitalRegistered }) {
 
                   {/* Approved Expiry & Live Countdown */}
                   {details.status === "approved" && expiryTimestamp > 0 && (
-                    <div className="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-500/20 text-xs text-emerald-300 space-y-1">
+                    <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-1">
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-emerald-400/80 font-medium">Access Expires:</span>
-                        <span className="font-mono font-bold text-emerald-300">
+                        <span className="text-emerald-700 font-medium">Access Expires:</span>
+                        <span className="font-mono font-bold text-emerald-800">
                           {countdown}
                         </span>
                       </div>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[10px] text-emerald-700/80 font-mono">
                         {new Date(expiryTimestamp * 1000).toLocaleString()}
                       </p>
                     </div>
                   )}
 
                   {details.status === "revoked" && (
-                    <p className="text-[11px] text-rose-400/90 italic">
+                    <p className="text-[11px] text-rose-600 italic">
                       The patient revoked access for your hospital.
                     </p>
                   )}

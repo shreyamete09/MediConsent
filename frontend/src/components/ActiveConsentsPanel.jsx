@@ -221,33 +221,45 @@ export default function ActiveConsentsPanel({ refreshTrigger, onConsentRevoked }
   );
 
   return (
-    <div className="glass-panel rounded-2xl p-6 border border-slate-800 space-y-4">
+    <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-6">
       {/* ── Section Header ──────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 className="text-lg font-bold text-white flex items-center space-x-2">
-            <Shield className="w-5 h-5 text-emerald-400" />
-            <span>Active & Granted Consents</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30">
-              {activeCount} active
-            </span>
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Manage granular, time-limited permissions. You can revoke hospital access at any time in O(1) gas.
-          </p>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-700">
+            <Shield className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
+              <span>Active & Granted Consents</span>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                {activeCount} active
+              </span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Live delegations with real-time countdown clocks. You retain perpetual right of immediate cryptographic revocation.
+            </p>
+          </div>
         </div>
 
-        <button
-          onClick={() => {
-            refetchGrants();
-            setLocalRefresh((prev) => prev + 1);
-          }}
-          disabled={isEventsLoading || isResolving}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-900 border border-slate-700 text-slate-300 hover:text-white transition-colors disabled:opacity-50"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isEventsLoading || isResolving ? "animate-spin" : ""}`} />
-          <span>Refresh</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          {activeCount > 0 && (
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              {activeCount} Delegations Active
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              refetchGrants();
+              setLocalRefresh((prev) => prev + 1);
+            }}
+            disabled={isEventsLoading || isResolving}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isEventsLoading || isResolving ? "animate-spin" : ""}`} />
+            <span>Refresh</span>
+          </button>
+        </div>
       </div>
 
       {/* Transaction status */}
@@ -256,16 +268,16 @@ export default function ActiveConsentsPanel({ refreshTrigger, onConsentRevoked }
       {/* Loading state */}
       {(isEventsLoading || isResolving) && (
         <div className="py-10 text-center space-y-2">
-          <RefreshCw className="w-6 h-6 text-emerald-400 animate-spin mx-auto" />
-          <p className="text-xs text-slate-400">Loading consent grants & verifying on-chain access…</p>
+          <RefreshCw className="w-6 h-6 text-teal-700 animate-spin mx-auto" />
+          <p className="text-xs text-slate-500">Loading consent grants & verifying on-chain access…</p>
         </div>
       )}
 
       {/* Empty state */}
       {!isEventsLoading && !isResolving && processedConsents.length === 0 && (
-        <div className="glass-card rounded-xl p-8 text-center border border-slate-800 space-y-2">
-          <Shield className="w-8 h-8 text-slate-700 mx-auto" />
-          <h4 className="text-sm font-semibold text-slate-300">No Consents Granted</h4>
+        <div className="rounded-2xl p-8 text-center border border-dashed border-slate-200 bg-slate-50/50 space-y-2">
+          <Shield className="w-8 h-8 text-slate-400 mx-auto" />
+          <h4 className="text-sm font-bold text-slate-800">No Consents Granted</h4>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
             You have not granted access to any hospital yet. Incoming requests will appear in the Pending Requests section above.
           </p>
@@ -282,120 +294,105 @@ export default function ActiveConsentsPanel({ refreshTrigger, onConsentRevoked }
             return (
               <div
                 key={consent.key}
-                className={`glass-card rounded-xl p-4 border transition-all space-y-3 ${
+                className={`rounded-2xl p-5 sm:p-6 border transition-all space-y-4 shadow-sm ${
                   consent.status === "active"
-                    ? "border-emerald-500/30 bg-emerald-950/10 shadow-sm"
+                    ? "bg-slate-50 border-slate-200/90 hover:border-slate-300"
                     : consent.status === "revoked"
-                    ? "border-rose-900/40 bg-rose-950/5 opacity-75"
-                    : "border-slate-800 bg-slate-950/30 opacity-60"
+                    ? "bg-rose-50/40 border-rose-200 opacity-80"
+                    : "bg-slate-50 border-slate-200 opacity-60"
                 }`}
               >
-                {/* Top: Status badge + Countdown / Expired / Revoked */}
-                <div className="flex items-center justify-between">
-                  {consent.status === "active" && (
-                    <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-500/30">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>Active Access</span>
-                    </span>
-                  )}
-                  {consent.status === "revoked" && (
-                    <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-950/80 text-rose-300 border border-rose-500/30">
-                      <XCircle className="w-3.5 h-3.5" />
-                      <span>Consent Revoked</span>
-                    </span>
-                  )}
-                  {consent.status === "expired" && (
-                    <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>Consent Expired</span>
-                    </span>
-                  )}
-
-                  {/* Countdown or status label */}
-                  {consent.status === "active" && (
-                    <div className="flex items-center space-x-1 text-xs font-mono font-bold text-emerald-400">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{countdownText}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Hospital info */}
-                <div className="p-2.5 rounded-lg bg-slate-950/50 border border-slate-800/80 space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400 flex items-center space-x-1.5">
-                      <Building2 className="w-3.5 h-3.5 text-blue-400" />
-                      <span>Hospital:</span>
-                    </span>
-                    <button
-                      onClick={() => handleCopy(consent.hospital, `hosp-${consent.key}`)}
-                      className="text-[10px] text-slate-400 hover:text-emerald-400 flex items-center space-x-1 transition-colors"
-                    >
-                      <Copy className="w-2.5 h-2.5" />
-                      <span>{copiedField === `hosp-${consent.key}` ? "Copied" : "Copy"}</span>
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-200 text-xs truncate">
-                      {consent.hospitalName || "Registered Hospital"}
-                    </span>
-                    <span className="font-mono text-[11px] text-slate-400">
-                      {consent.hospital.slice(0, 8)}…{consent.hospital.slice(-6)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Shared categories */}
-                <div className="space-y-1">
-                  <span className="text-[11px] text-slate-400 block font-medium">
-                    Consented Categories:
-                  </span>
+                {/* Top: Category Badge + Countdown / Status */}
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/70 pb-3">
                   <div className="flex flex-wrap gap-1">
                     {consent.recordTypes.map((t) => (
                       <span
                         key={t}
-                        className={`text-[10px] px-2 py-0.5 rounded-md border ${
-                          consent.status === "active"
-                            ? "bg-emerald-950/60 text-emerald-300 border-emerald-500/25"
-                            : "bg-slate-900 text-slate-400 border-slate-800"
-                        }`}
+                        className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200"
                       >
                         {recordTypeLabel(t)}
                       </span>
                     ))}
                   </div>
+
+                  {/* Countdown or status pill */}
+                  {consent.status === "active" && (
+                    <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>{countdownText} remaining</span>
+                    </span>
+                  )}
+                  {consent.status === "revoked" && (
+                    <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                      <XCircle className="w-3.5 h-3.5" />
+                      <span>Consent Revoked</span>
+                    </span>
+                  )}
+                  {consent.status === "expired" && (
+                    <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Consent Expired</span>
+                    </span>
+                  )}
                 </div>
 
-                {/* Expiry details */}
-                <div className="text-[11px] text-slate-400 flex items-center justify-between pt-0.5">
-                  <span>Expiration Date:</span>
-                  <span className="font-medium text-slate-300">
-                    {new Date(consent.expiryTimestamp * 1000).toLocaleString()}
+                {/* Hospital info box */}
+                <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-slate-900 text-sm">
+                      {consent.hospitalName || "Registered Hospital"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(consent.hospital, `hosp-${consent.key}`)}
+                      className="text-[11px] text-slate-500 hover:text-teal-700 flex items-center space-x-1 transition-colors"
+                    >
+                      <Copy className="w-3 h-3" />
+                      <span>{copiedField === `hosp-${consent.key}` ? "Copied" : "Copy"}</span>
+                    </button>
+                  </div>
+                  <p className="font-mono text-xs text-slate-600">
+                    {consent.hospital.slice(0, 10)}…{consent.hospital.slice(-6)}
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    Authorized Scope: {consent.recordTypes.map(recordTypeLabel).join(", ")}
+                  </p>
+                </div>
+
+                {/* Envelope spec & Expiration Details */}
+                <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-500 pt-1">
+                  <span className="flex items-center space-x-1 font-medium text-teal-800">
+                    <Lock className="w-3.5 h-3.5 text-teal-700" />
+                    <span>Client-side AES-256-GCM envelope</span>
+                  </span>
+                  <span className="font-mono text-[10px]">
+                    Expires: {new Date(consent.expiryTimestamp * 1000).toLocaleDateString()}
                   </span>
                 </div>
 
                 {/* Revoke Action */}
                 {consent.status === "active" && (
                   <button
+                    type="button"
                     onClick={() => setConfirmRevokeHospital(consent.hospital)}
                     disabled={isRevoking}
-                    className="w-full flex items-center justify-center space-x-1.5 py-2 rounded-lg font-semibold text-xs text-rose-300 bg-rose-950/50 hover:bg-rose-900/60 border border-rose-500/30 hover:border-rose-500/50 transition-colors disabled:opacity-40"
+                    className="w-full flex items-center justify-center space-x-2 py-2.5 rounded-xl font-semibold text-xs text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-colors shadow-sm disabled:opacity-40"
                   >
-                    <ShieldAlert className="w-3.5 h-3.5" />
+                    <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
                     <span>
-                      {isCurrentlyRevoking ? "Revoking On-Chain…" : "Revoke Access Immediately"}
+                      {isCurrentlyRevoking ? "Revoking On-Chain…" : "Revoke Consent Instantly"}
                     </span>
                   </button>
                 )}
 
                 {consent.status === "revoked" && (
-                  <p className="text-[11px] text-rose-400/80 italic text-center">
-                    Access revoked. The hospital cannot query keys or decrypt new records.
+                  <p className="text-[11px] text-rose-600 italic text-center pt-1 font-medium">
+                    Access revoked. The hospital cannot query keys or decrypt records.
                   </p>
                 )}
 
                 {consent.status === "expired" && (
-                  <p className="text-[11px] text-slate-500 italic text-center">
+                  <p className="text-[11px] text-slate-500 italic text-center pt-1">
                     Consent window has closed. The hospital must request new access.
                   </p>
                 )}
@@ -407,26 +404,26 @@ export default function ActiveConsentsPanel({ refreshTrigger, onConsentRevoked }
 
       {/* ── Confirmation Modal ────────────────────────────────────────────── */}
       {confirmRevokeHospital && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="glass-panel max-w-md w-full p-6 rounded-2xl border border-rose-500/40 bg-slate-950/95 space-y-4 shadow-2xl">
-            <div className="flex items-center space-x-3 text-rose-400">
-              <div className="w-10 h-10 rounded-xl bg-rose-950 border border-rose-500/30 flex items-center justify-center">
-                <ShieldAlert className="w-5 h-5 text-rose-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="max-w-md w-full p-6 sm:p-7 rounded-3xl border border-slate-200 bg-white space-y-4 shadow-2xl">
+            <div className="flex items-center space-x-3 text-rose-700">
+              <div className="w-11 h-11 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center">
+                <ShieldAlert className="w-6 h-6 text-rose-600" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">Revoke Hospital Access?</h3>
-                <p className="text-xs text-slate-400">Immediate on-chain consent invalidation</p>
+                <h3 className="text-base font-bold text-slate-900">Revoke Hospital Access?</h3>
+                <p className="text-xs text-slate-500">Immediate on-chain consent invalidation</p>
               </div>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/25 text-xs text-amber-300 leading-relaxed">
-              <span className="font-semibold block mb-1">Security Notice:</span>
+            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
+              <span className="font-bold block mb-1">Security Notice:</span>
               "This stops future access. A hospital that already decrypted a record keeps its copy."
             </div>
 
             <div className="space-y-1 text-xs">
-              <span className="text-slate-400">Target Hospital Address:</span>
-              <p className="font-mono text-slate-200 text-[11px] bg-slate-900 p-2 rounded-lg border border-slate-800 break-all">
+              <span className="text-slate-600 font-semibold text-[11px]">Target Hospital Address:</span>
+              <p className="font-mono text-slate-900 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-200 break-all">
                 {confirmRevokeHospital}
               </p>
             </div>
@@ -436,7 +433,7 @@ export default function ActiveConsentsPanel({ refreshTrigger, onConsentRevoked }
                 type="button"
                 onClick={() => setConfirmRevokeHospital(null)}
                 disabled={isRevoking}
-                className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors disabled:opacity-50"
+                className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -444,7 +441,7 @@ export default function ActiveConsentsPanel({ refreshTrigger, onConsentRevoked }
                 type="button"
                 onClick={handleConfirmRevoke}
                 disabled={isRevoking}
-                className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-500 shadow-lg shadow-rose-600/20 transition-all disabled:opacity-50 flex items-center justify-center space-x-1.5"
+                className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition-all disabled:opacity-50 flex items-center justify-center space-x-1.5"
               >
                 <ShieldAlert className="w-4 h-4" />
                 <span>{isRevoking ? "Revoking…" : "Yes, Revoke Consent"}</span>

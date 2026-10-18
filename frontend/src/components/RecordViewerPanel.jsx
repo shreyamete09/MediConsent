@@ -42,6 +42,9 @@ import {
   User,
   Hash,
   X,
+  KeyRound,
+  Copy,
+  Check,
 } from "lucide-react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5001";
@@ -51,22 +54,41 @@ function detectMimeType(bytes) {
   if (bytes.length >= 4) {
     // PDF: %PDF
     if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) {
-      return { mime: "application/pdf", ext: "pdf", isPdf: true, isImage: false };
+      return { mime: "application/pdf", ext: "pdf", isPdf: true, isImage: false, isText: false };
     }
     // PNG: \x89PNG
     if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
-      return { mime: "image/png", ext: "png", isPdf: false, isImage: true };
+      return { mime: "image/png", ext: "png", isPdf: false, isImage: true, isText: false };
     }
     // JPEG: \xFF\xD8\xFF
     if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
-      return { mime: "image/jpeg", ext: "jpg", isPdf: false, isImage: true };
+      return { mime: "image/jpeg", ext: "jpg", isPdf: false, isImage: true, isText: false };
     }
     // GIF: GIF8
     if (bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x38) {
-      return { mime: "image/gif", ext: "gif", isPdf: false, isImage: true };
+      return { mime: "image/gif", ext: "gif", isPdf: false, isImage: true, isText: false };
     }
   }
-  return { mime: "application/octet-stream", ext: "bin", isPdf: false, isImage: false };
+  // Check if valid UTF-8 text or JSON
+  try {
+    const decoder = new TextDecoder("utf-8", { fatal: true });
+    const text = decoder.decode(bytes);
+    const trimmed = text.trim();
+    const isJson =
+      (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+      (trimmed.startsWith("[") && trimmed.endsWith("]"));
+    return {
+      mime: isJson ? "application/json" : "text/plain",
+      ext: isJson ? "json" : "txt",
+      isPdf: false,
+      isImage: false,
+      isText: true,
+      textContent: text,
+    };
+  } catch (e) {
+    // Binary octet stream
+  }
+  return { mime: "application/octet-stream", ext: "bin", isPdf: false, isImage: false, isText: false };
 }
 
 export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) {
@@ -80,8 +102,16 @@ export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) 
   // Active view modal state
   const [activeViewModal, setActiveViewModal] = useState(null);
   const [viewTxStatus, setViewTxStatus] = useState({ status: "idle", message: "" });
-  const [viewResult, setViewResult] = useState(null); // { isVerified, blobUrl, mimeInfo, record, hashes }
+  const [viewResult, setViewResult] = useState(null); // { isVerified, blobUrl, mimeInfo, record, hashes, logTxHash, blockNumber, logTimestamp, hospitalAddress }
   const [isViewing, setIsViewing] = useState(false);
+  const [copiedModalField, setCopiedModalField] = useState(null);
+
+  const handleCopyModal = (text, id) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text);
+    setCopiedModalField(id);
+    setTimeout(() => setCopiedModalField(null), 2000);
+  };
 
   // Query ConsentGranted events where indexed hospital == account
   const { events: grantEvents, isLoading: isGrantsLoading } = useContractEvents(
@@ -205,7 +235,10 @@ export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) 
       }
 
       setStatus("confirming", `⛓ [Step 1/6] Waiting for logAccess confirmation… (tx: ${logTx.hash.slice(0, 10)}…)`);
-      await logTx.wait();
+      const receipt = await logTx.wait();
+      const logTxHash = logTx.hash;
+      const blockNumber = receipt?.blockNumber ? Number(receipt.blockNumber) : null;
+      const logTimestamp = Date.now();
 
       // ── Step b: Fetch hospital key envelope ─────────────────────────────────
       setStatus("encrypting", `🔒 [Step 2/6] Fetching hospital key envelope for Record #${record.id}…`);
@@ -269,6 +302,11 @@ export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) 
           isTamperedCiphertext: true,
           errorMessage: "Decryption failed: AES-256-GCM authentication tag verification failed. The ciphertext or IV in storage has been tampered with or corrupted.",
           onChainHash: record.recordHash,
+          recomputedHash: "N/A (Ciphertext authentication failure)",
+          logTxHash,
+          blockNumber,
+          logTimestamp,
+          hospitalAddress: account,
         });
         return; // Halt and strictly block any file display
       }
@@ -298,6 +336,10 @@ export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) 
         recomputedHash,
         onChainHash: record.recordHash,
         fileSize: decryptedBytes.length,
+        logTxHash,
+        blockNumber,
+        logTimestamp,
+        hospitalAddress: account,
       });
     } catch (err) {
       console.error("View record error:", err);
@@ -308,26 +350,26 @@ export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) 
   };
 
   return (
-    <div className="glass-panel rounded-2xl p-6 border border-slate-800 space-y-5">
+    <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-6">
       {/* ── Section Header ──────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
         <div>
-          <h2 className="text-lg font-bold text-white flex items-center space-x-2">
-            <Eye className="w-5 h-5 text-emerald-400" />
+          <h2 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <Eye className="w-5 h-5 text-teal-700" />
             <span>Consented Medical Records</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
               {consentedRecords.length}
             </span>
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Decrypted client-side only after on-chain logAccess confirmation. Tamper detection verified against smart contract.
+          <p className="text-xs text-slate-500 mt-0.5">
+            Decrypted client-side only after on-chain logAccess confirmation. Tamper detection verified against contract event logs.
           </p>
         </div>
 
         <button
           onClick={() => setRefreshTrigger((prev) => prev + 1)}
           disabled={isLoadingRecords || isGrantsLoading}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-900 border border-slate-700 text-slate-300 hover:text-white transition-colors disabled:opacity-50"
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition-colors disabled:opacity-50"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isLoadingRecords || isGrantsLoading ? "animate-spin" : ""}`} />
           <span>Refresh</span>
@@ -337,32 +379,32 @@ export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) 
       {/* Loading state */}
       {(isLoadingRecords || isGrantsLoading) && (
         <div className="py-12 text-center space-y-2">
-          <RefreshCw className="w-6 h-6 text-emerald-400 animate-spin mx-auto" />
-          <p className="text-xs text-slate-400">Discovering consented records & validating on-chain permissions…</p>
+          <RefreshCw className="w-6 h-6 text-teal-700 animate-spin mx-auto" />
+          <p className="text-xs text-slate-500">Discovering consented records & validating on-chain permissions…</p>
         </div>
       )}
 
       {/* Error state */}
       {loadError && (
-        <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-xs text-rose-300">
+        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800">
           Failed to load records: {loadError}
         </div>
       )}
 
       {/* Empty state */}
       {!isLoadingRecords && !isGrantsLoading && consentedRecords.length === 0 && (
-        <div className="glass-card rounded-xl p-8 text-center border border-slate-800 space-y-2">
-          <FileText className="w-8 h-8 text-slate-700 mx-auto" />
-          <h4 className="text-sm font-semibold text-slate-300">No Consented Records</h4>
+        <div className="rounded-2xl p-8 text-center border border-dashed border-slate-200 bg-slate-50/50 space-y-2">
+          <FileText className="w-8 h-8 text-slate-400 mx-auto" />
+          <h4 className="text-sm font-bold text-slate-800">No Consented Records</h4>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            You do not currently hold active consent for any patient records. Submit an access request in the "Request Patient Access" tab and wait for patient approval.
+            You do not currently hold active consent for any patient records. Submit an access request in the "Request Access" tab and wait for patient approval.
           </p>
         </div>
       )}
 
       {/* Consented Records Grid */}
       {!isLoadingRecords && consentedRecords.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4">
           {consentedRecords.map((rec) => {
             const isAccessActive = rec.hasAccess;
             const categoryName = recordTypeLabel(rec.recordType);
@@ -370,66 +412,89 @@ export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) 
             return (
               <div
                 key={rec.id}
-                className={`glass-card rounded-xl p-4 border transition-all space-y-3 ${
+                className={`bg-slate-50 rounded-2xl p-5 sm:p-6 border transition-all space-y-4 ${
                   isAccessActive
-                    ? "border-emerald-500/30 hover:border-emerald-500/50"
-                    : "border-slate-800 opacity-60"
+                    ? "border-slate-200/90 hover:border-slate-300"
+                    : "border-slate-200 opacity-60"
                 }`}
               >
                 {/* Top: ID + Category + Access Status */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs font-bold text-white px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700">
-                      Record #{rec.id}
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/70 pb-3">
+                  <div className="flex items-center space-x-2.5">
+                    <span className="text-sm font-extrabold text-slate-900 font-mono">
+                      #REC-{rec.id}
                     </span>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/25">
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
                       {categoryName}
                     </span>
                   </div>
 
                   {isAccessActive ? (
-                    <span className="inline-flex items-center space-x-1 text-[11px] font-semibold text-emerald-400">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Active Consent</span>
+                    <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      <span>Consent Active</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center space-x-1 text-[11px] font-semibold text-rose-400">
-                      <XCircle className="w-3.5 h-3.5" />
+                    <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                       <span>Consent Inactive</span>
                     </span>
                   )}
                 </div>
 
-                {/* Patient Address */}
-                <div className="flex items-center justify-between text-xs bg-slate-950/40 p-2 rounded-lg border border-slate-800/80">
-                  <span className="text-slate-400 flex items-center space-x-1.5">
-                    <User className="w-3.5 h-3.5 text-blue-400" />
-                    <span>Patient:</span>
-                  </span>
-                  <span className="font-mono text-slate-200 text-[11px]">
-                    {rec.patient.slice(0, 8)}…{rec.patient.slice(-6)}
-                  </span>
+                {/* Middle Two Columns: Patient & Payload CID */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  {/* Patient Sovereign Identifier */}
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 space-y-1.5">
+                    <span className="text-slate-500 text-[11px] block font-sans">
+                      Patient Sovereign Identifier:
+                    </span>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-6 h-6 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center font-bold text-[10px]">
+                        {rec.patient.slice(2, 4).toUpperCase()}
+                      </div>
+                      <span className="font-mono font-semibold text-slate-900 text-xs">
+                        {rec.patient.slice(0, 8)}…{rec.patient.slice(-6)}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-400">
+                      Authorized scope: {categoryName}
+                    </p>
+                  </div>
+
+                  {/* Encrypted Storage CID (Rule 3: do not say pinned to IPFS) */}
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200/80 space-y-1.5">
+                    <span className="text-slate-500 text-[11px] block font-sans">
+                      Encrypted storage CID:
+                    </span>
+                    <p className="font-mono text-[11px] text-slate-800 truncate bg-slate-50 px-2 py-1 rounded border border-slate-100">
+                      {rec.ipfsCid}
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      Client-side AES-256-GCM envelope
+                    </p>
+                  </div>
                 </div>
 
-                {/* CID preview */}
-                <div className="text-[11px] space-y-0.5">
-                  <span className="text-slate-400">Encrypted IPFS CID:</span>
-                  <p className="font-mono text-[10px] text-slate-400 truncate bg-slate-900/60 px-2 py-1 rounded border border-slate-800">
-                    {rec.ipfsCid}
-                  </p>
-                </div>
+                {/* Bottom Row: Status note & Action Button */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                  <div className="text-[11px] text-slate-500 flex items-center space-x-1.5">
+                    <Lock className="w-3.5 h-3.5 text-teal-700" />
+                    <span>Smart contract consent verified • Encrypted in transit</span>
+                  </div>
 
-                {/* Action button */}
-                <button
-                  onClick={() => handleOpenRecord(rec)}
-                  disabled={!isAccessActive || isViewing}
-                  className="w-full flex items-center justify-center space-x-1.5 py-2.5 rounded-xl font-semibold text-xs text-white bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-md shadow-emerald-500/15 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>
-                    {isAccessActive ? "View Record (Log & Decrypt)" : "Consent Expired / Revoked"}
-                  </span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenRecord(rec)}
+                    disabled={!isAccessActive || isViewing}
+                    className="flex items-center space-x-2 px-5 py-2.5 rounded-xl font-semibold text-xs text-white bg-teal-800 hover:bg-teal-700 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>
+                      {isAccessActive ? "View Record (Log & Decrypt)" : "Consent Expired / Revoked"}
+                    </span>
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -438,35 +503,42 @@ export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) 
 
       {/* ── Secure Decryption & Viewer Modal ───────────────────────────────── */}
       {activeViewModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fadeIn">
-          <div className="glass-panel max-w-2xl w-full max-h-[90vh] flex flex-col rounded-2xl border border-slate-700 bg-slate-950 shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="max-w-3xl w-full max-h-[92vh] flex flex-col rounded-3xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/70">
-              <div className="flex items-center space-x-2">
-                <FileText className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-sm font-bold text-white">
-                  Medical Record #{activeViewModal.id} ({recordTypeLabel(activeViewModal.recordType)})
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
+              <div>
+                <div className="flex items-center space-x-1.5 text-[10px] font-bold tracking-wider text-teal-800 uppercase">
+                  <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+                  <span>Cryptographic Proof Engine</span>
+                </div>
+                <h3 className="text-base font-bold text-slate-900 mt-0.5">
+                  Medical Record #{activeViewModal.id}{" "}
+                  <span className="text-xs font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200 ml-1">
+                    {recordTypeLabel(activeViewModal.recordType)}
+                  </span>
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={handleCloseModal}
                 disabled={isViewing}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors disabled:opacity-30"
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors disabled:opacity-30"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-5 flex-1">
+            <div className="p-6 overflow-y-auto space-y-4 flex-1 bg-white">
               {/* Step-by-Step Status Banner */}
               <TxStatus status={viewTxStatus.status} message={viewTxStatus.message} />
 
               {/* Progress skeleton while viewing */}
               {isViewing && (
-                <div className="py-8 text-center space-y-3">
-                  <Lock className="w-8 h-8 text-emerald-400 animate-pulse mx-auto" />
-                  <p className="text-xs text-slate-300 font-medium">
+                <div className="py-10 text-center space-y-3">
+                  <Lock className="w-9 h-9 text-teal-700 animate-pulse mx-auto" />
+                  <p className="text-xs text-slate-700 font-semibold">
                     Performing cryptographic handshake in your browser…
                   </p>
                   <p className="text-[11px] text-slate-500 max-w-md mx-auto">
@@ -478,88 +550,217 @@ export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) 
               {/* ── Verification Result Badges ──────────────────────────────── */}
               {viewResult && (
                 <div className="space-y-4">
+                  {/* Verified State */}
                   {viewResult.isVerified ? (
-                    <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 space-y-2">
-                      <div className="flex items-center space-x-2 text-emerald-300 font-bold text-sm">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                        <span>Verified: hash matches blockchain</span>
+                    <div className="p-5 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 text-emerald-900 font-bold text-sm">
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                          <span>✓ Verified: Hash matches blockchain</span>
+                        </div>
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          <Check className="w-3 h-3 text-emerald-700" />
+                          <span>Intact</span>
+                        </span>
                       </div>
-                      <p className="text-[11px] text-emerald-200/80 leading-relaxed">
-                        The SHA-256 integrity hash of this decrypted file was matched against the immutable on-chain record hash. The file has not been altered since upload.
+
+                      <p className="text-xs text-emerald-800 leading-relaxed">
+                        SHA-256 Digest matches On-Chain Contract Record #{activeViewModal.id}. Block confirmation: #{viewResult.blockNumber || "N/A"}.
                       </p>
-                      <div className="text-[10px] font-mono text-emerald-400/90 break-all bg-emerald-950/60 p-2 rounded border border-emerald-500/20">
-                        {viewResult.recomputedHash}
+
+                      {/* Side by side hashes */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                        <div className="bg-white p-3 rounded-xl border border-emerald-200 space-y-1">
+                          <div className="flex items-center justify-between text-[10px] font-semibold text-slate-500 uppercase">
+                            <span>On-Chain Record Hash</span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyModal(viewResult.onChainHash, "onChainHash")}
+                              className="text-slate-400 hover:text-teal-700"
+                              title="Copy on-chain hash"
+                            >
+                              {copiedModalField === "onChainHash" ? (
+                                <Check className="w-3 h-3 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3 h-3" />
+                              )}
+                            </button>
+                          </div>
+                          <p className="font-mono text-[11px] text-slate-800 break-all">{viewResult.onChainHash}</p>
+                        </div>
+
+                        <div className="bg-white p-3 rounded-xl border border-emerald-200 space-y-1">
+                          <div className="flex items-center justify-between text-[10px] font-semibold text-slate-500 uppercase">
+                            <span>Recomputed File Digest</span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyModal(viewResult.recomputedHash, "recomputedHash")}
+                              className="text-slate-400 hover:text-teal-700"
+                              title="Copy recomputed digest"
+                            >
+                              {copiedModalField === "recomputedHash" ? (
+                                <Check className="w-3 h-3 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3 h-3" />
+                              )}
+                            </button>
+                          </div>
+                          <p className="font-mono text-[11px] text-slate-800 break-all">{viewResult.recomputedHash}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-2 text-[11px] text-emerald-800 font-semibold pt-1">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span>On-Chain Cryptographic Verification Passed • Hashes match exactly</span>
                       </div>
                     </div>
                   ) : viewResult.isTamperedCiphertext ? (
-                    <div className="p-4 rounded-xl bg-rose-950/50 border border-rose-500/50 space-y-2">
-                      <div className="flex items-center space-x-2 text-rose-300 font-bold text-sm">
-                        <ShieldAlert className="w-5 h-5 text-rose-400 flex-shrink-0" />
-                        <span>TAMPERED: Ciphertext authentication failed</span>
+                    /* Tamper Case A: Ciphertext authentication failed */
+                    <div className="p-5 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 text-rose-900 font-bold text-sm">
+                          <ShieldAlert className="w-5 h-5 text-rose-600 flex-shrink-0" />
+                          <span>TAMPERED: Ciphertext authentication failed</span>
+                        </div>
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-800 border border-rose-200">
+                          Storage Tampering Detected
+                        </span>
                       </div>
-                      <p className="text-[11px] text-rose-200/90 leading-relaxed">
+                      <p className="text-xs text-rose-800 leading-relaxed">
                         SECURITY ALERT (Case A - Storage Tampering): The 128-bit AES-256-GCM authentication tag verification failed. The encrypted ciphertext or initialization vector stored off-chain has been modified or corrupted. File display is strictly blocked.
                       </p>
-                      <div className="text-[10px] font-mono text-rose-300 bg-rose-950/60 p-2.5 rounded border border-rose-500/20 leading-relaxed">
+                      <div className="text-[11px] font-mono text-rose-900 bg-white p-3 rounded-xl border border-rose-200">
                         {viewResult.errorMessage}
                       </div>
                     </div>
                   ) : (
-                    <div className="p-4 rounded-xl bg-rose-950/50 border border-rose-500/50 space-y-2">
-                      <div className="flex items-center space-x-2 text-rose-300 font-bold text-sm">
-                        <ShieldAlert className="w-5 h-5 text-rose-400 flex-shrink-0" />
-                        <span>TAMPERED: file does not match the on-chain hash</span>
+                    /* Tamper Case B: Hash mismatch */
+                    <div className="p-5 rounded-2xl bg-rose-50 border border-rose-200 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2 text-rose-900 font-bold text-sm">
+                          <ShieldAlert className="w-5 h-5 text-rose-600 flex-shrink-0" />
+                          <span>TAMPERED: File does not match on-chain hash</span>
+                        </div>
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-800 border border-rose-200">
+                          Integrity Mismatch
+                        </span>
                       </div>
-                      <p className="text-[11px] text-rose-200/90 leading-relaxed">
+                      <p className="text-xs text-rose-800 leading-relaxed">
                         SECURITY ALERT (Case B - Hash Mismatch): The file was decrypted, but its recomputed SHA-256 hash does not match the immutable record hash committed to the blockchain. File display is strictly blocked to protect clinical integrity.
                       </p>
-                      <div className="space-y-1 text-[10px] font-mono">
-                        <p className="text-slate-400">On-Chain Expected: <span className="text-rose-300">{viewResult.onChainHash}</span></p>
-                        <p className="text-slate-400">Recomputed Actual: <span className="text-rose-400">{viewResult.recomputedHash}</span></p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                        <div className="bg-white p-3 rounded-xl border border-rose-200 space-y-1">
+                          <span className="text-[10px] font-semibold text-slate-500 uppercase">On-Chain Expected Hash</span>
+                          <p className="font-mono text-[11px] text-rose-900 break-all">{viewResult.onChainHash}</p>
+                        </div>
+                        <div className="bg-white p-3 rounded-xl border border-rose-200 space-y-1">
+                          <span className="text-[10px] font-semibold text-slate-500 uppercase">Recomputed Actual Hash</span>
+                          <p className="font-mono text-[11px] text-rose-900 break-all">{viewResult.recomputedHash}</p>
+                        </div>
                       </div>
                     </div>
                   )}
 
+                  {/* Decryption & Access Log Context Bar */}
+                  <div className="bg-sky-50/80 border border-sky-100 rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center space-x-2 text-slate-700">
+                      <KeyRound className="w-4 h-4 text-sky-600 flex-shrink-0" />
+                      <span>
+                        Decrypted client-side using Hospital{" "}
+                        <strong className="font-mono text-slate-900">
+                          {viewResult.hospitalAddress
+                            ? `${viewResult.hospitalAddress.slice(0, 8)}…${viewResult.hospitalAddress.slice(-6)}`
+                            : "Registered"}
+                        </strong>{" "}
+                        key at{" "}
+                        {new Date(viewResult.logTimestamp).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                          timeZoneName: "short",
+                        })}
+                        .
+                      </span>
+                    </div>
+
+                    <div className="flex items-center space-x-2 text-[11px]">
+                      {viewResult.blockNumber && (
+                        <span className="font-mono text-slate-600 bg-white px-2 py-0.5 rounded-lg border border-sky-200">
+                          Block #{viewResult.blockNumber}
+                        </span>
+                      )}
+                      {viewResult.logTxHash && (
+                        <div className="flex items-center space-x-1 font-mono text-sky-800 bg-white px-2 py-0.5 rounded-lg border border-sky-200">
+                          <span>Tx: {viewResult.logTxHash.slice(0, 8)}…{viewResult.logTxHash.slice(-6)}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyModal(viewResult.logTxHash, "logTxHash")}
+                            className="p-0.5 text-slate-400 hover:text-sky-700"
+                            title="Copy transaction hash"
+                          >
+                            {copiedModalField === "logTxHash" ? (
+                              <Check className="w-3 h-3 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   {/* ── File Content (Rendered ONLY if verified) ──────────────── */}
                   {viewResult.isVerified && viewResult.blobUrl && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-xs text-slate-300 font-semibold">
-                        <span>Decrypted Record Preview:</span>
+                    <div className="space-y-4 pt-1">
+                      <div className="flex items-center justify-between text-xs text-slate-700 font-semibold border-b border-slate-100 pb-2">
+                        <span className="flex items-center space-x-1.5">
+                          <FileText className="w-4 h-4 text-teal-700" />
+                          <span>Decrypted Record Preview</span>
+                        </span>
                         <span className="text-slate-500 font-normal">
-                          {(viewResult.fileSize / 1024).toFixed(1)} KB ({viewResult.mimeInfo.mime})
+                          {(viewResult.fileSize / 1024).toFixed(1)} KB • {viewResult.mimeInfo.mime}
                         </span>
                       </div>
 
                       {/* Image Preview */}
                       {viewResult.mimeInfo.isImage && (
-                        <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-center">
+                        <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center">
                           <img
                             src={viewResult.blobUrl}
                             alt="Decrypted Medical Record"
-                            className="max-h-80 mx-auto rounded-lg object-contain"
+                            className="max-h-96 mx-auto rounded-xl object-contain shadow-sm"
                           />
                         </div>
                       )}
 
                       {/* PDF Preview */}
                       {viewResult.mimeInfo.isPdf && (
-                        <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-900">
+                        <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50">
                           <iframe
                             src={viewResult.blobUrl}
                             title="Decrypted PDF Record"
-                            className="w-full h-80 rounded-xl"
+                            className="w-full h-96 rounded-2xl"
                           />
                         </div>
                       )}
 
-                      {/* Generic / Download link */}
+                      {/* Text / JSON Preview */}
+                      {viewResult.mimeInfo.isText && (
+                        <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 p-4">
+                          <pre className="text-xs font-mono text-slate-800 whitespace-pre-wrap break-all max-h-80 overflow-y-auto">
+                            {viewResult.mimeInfo.textContent}
+                          </pre>
+                        </div>
+                      )}
+
+                      {/* Download button */}
                       <div className="pt-2">
                         <a
                           href={viewResult.blobUrl}
                           download={`medical-record-${activeViewModal.id}.${viewResult.mimeInfo.ext}`}
-                          className="flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors shadow-sm"
+                          className="w-full flex items-center justify-center space-x-2 py-3 px-5 rounded-xl text-xs font-semibold text-white bg-teal-800 hover:bg-teal-700 shadow-sm transition-colors"
                         >
-                          <Download className="w-4 h-4 text-emerald-400" />
+                          <Download className="w-4 h-4 text-white" />
                           <span>Download Decrypted Medical Record</span>
                         </a>
                       </div>
@@ -570,12 +771,12 @@ export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) 
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-slate-800 bg-slate-900/50 flex justify-end">
+            <div className="px-6 py-3.5 border-t border-slate-100 bg-slate-50 flex justify-end">
               <button
                 type="button"
                 onClick={handleCloseModal}
                 disabled={isViewing}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors disabled:opacity-40"
+                className="px-5 py-2 rounded-xl text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-800 transition-colors disabled:opacity-40"
               >
                 Close
               </button>

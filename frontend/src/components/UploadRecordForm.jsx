@@ -177,14 +177,14 @@ export default function UploadRecordForm({ onSuccess }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Encryption assurance banner */}
-      <div className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/25 text-emerald-300 text-xs font-medium">
-        <Lock className="w-4 h-4 flex-shrink-0" />
-        <span>Encrypted in your browser before upload — the server never sees plaintext medical data</span>
+      <div className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 text-xs font-medium">
+        <Lock className="w-4 h-4 flex-shrink-0 text-teal-600" />
+        <span>Client-side AES-256-GCM encryption before upload — the server never sees plaintext medical data</span>
       </div>
 
       {/* Patient address */}
       <div className="space-y-1.5">
-        <label className="block text-sm font-medium text-slate-300">Patient Wallet Address</label>
+        <label className="block text-xs font-semibold text-slate-700">Patient Wallet Address</label>
         <input
           type="text"
           placeholder="0x..."
@@ -192,18 +192,18 @@ export default function UploadRecordForm({ onSuccess }) {
           onChange={(e) => setPatientAddress(e.target.value.trim())}
           required
           disabled={isDisabled}
-          className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 disabled:opacity-50 font-mono"
+          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-400 text-xs font-mono focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 disabled:opacity-50"
         />
       </div>
 
       {/* Record type */}
       <div className="space-y-1.5">
-        <label className="block text-sm font-medium text-slate-300">Record Type</label>
+        <label className="block text-xs font-semibold text-slate-700">Record Type</label>
         <select
           value={recordType}
           onChange={(e) => setRecordType(Number(e.target.value))}
           disabled={isDisabled}
-          className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 disabled:opacity-50"
+          className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 disabled:opacity-50"
         >
           {RECORD_TYPES.map((rt) => (
             <option key={rt.value} value={rt.value}>{rt.label}</option>
@@ -213,23 +213,23 @@ export default function UploadRecordForm({ onSuccess }) {
 
       {/* File picker */}
       <div className="space-y-1.5">
-        <label className="block text-sm font-medium text-slate-300">Medical Record File</label>
+        <label className="block text-xs font-semibold text-slate-700">Medical Record File</label>
         <div
-          className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-colors cursor-pointer
-            ${file ? "border-emerald-500/60 bg-emerald-950/20" : "border-slate-700 hover:border-slate-500"}
+          className={`relative border-2 border-dashed rounded-2xl p-6 text-center transition-colors cursor-pointer
+            ${file ? "border-teal-500 bg-teal-50/40" : "border-slate-300 hover:border-teal-600 bg-slate-50/50"}
             ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
           onClick={() => fileInputRef.current?.click()}
         >
-          <FileUp className={`w-8 h-8 mx-auto mb-2 ${file ? "text-emerald-400" : "text-slate-600"}`} />
+          <FileUp className={`w-8 h-8 mx-auto mb-2 ${file ? "text-teal-700" : "text-slate-400"}`} />
           {file ? (
             <div>
-              <p className="text-sm font-medium text-emerald-400">{file.name}</p>
+              <p className="text-sm font-semibold text-teal-800">{file.name}</p>
               <p className="text-xs text-slate-500 mt-0.5">{(file.size / 1024).toFixed(1)} KB</p>
             </div>
           ) : (
             <div>
-              <p className="text-sm text-slate-400">Click to select a file</p>
-              <p className="text-xs text-slate-600 mt-0.5">PDF, JPEG, PNG, DICOM — max 25 MB</p>
+              <p className="text-sm font-medium text-slate-700">Click to select a file</p>
+              <p className="text-xs text-slate-500 mt-0.5">PDF, JPEG, PNG, DICOM — max 25 MB</p>
             </div>
           )}
           <input
@@ -249,7 +249,7 @@ export default function UploadRecordForm({ onSuccess }) {
       <button
         type="submit"
         disabled={isDisabled || !file || !patientAddress || !contract}
-        className="w-full flex items-center justify-center space-x-2 py-3 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-lg shadow-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        className="w-full flex items-center justify-center space-x-2 py-3 rounded-xl font-semibold text-xs sm:text-sm text-white bg-teal-800 hover:bg-teal-700 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
       >
         <ShieldCheck className="w-4 h-4" />
         <span>
@@ -259,7 +259,7 @@ export default function UploadRecordForm({ onSuccess }) {
 
       {/* Not a hospital warning */}
       {!contract && (
-        <p className="text-xs text-center text-amber-400">Connect MetaMask to continue</p>
+        <p className="text-xs text-center text-amber-600">Connect MetaMask to continue</p>
       )}
     </form>
   );
