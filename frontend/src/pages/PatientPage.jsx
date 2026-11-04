@@ -479,6 +479,13 @@ export default function PatientPage() {
                 <strong>Client-side storage:</strong> Private keys are stored in browser localStorage. Download a backup to prevent permanent loss upon clearing browser data.
               </span>
             </div>
+
+            {/* Keystore Error Feedback */}
+            {keyError && (
+              <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700">
+                {keyError}
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}

@@ -41,8 +41,13 @@ export default function HospitalPage() {
   if (!account) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-20 text-center space-y-4">
-        <Building2 className="w-12 h-12 text-slate-700 mx-auto" />
-        <h2 className="text-xl font-semibold text-slate-400">Connect MetaMask to access the Hospital Portal</h2>
+        <div className="w-16 h-16 rounded-3xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto border border-slate-200">
+          <Building2 className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-800">Connect Your Wallet</h2>
+        <p className="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
+          Please connect MetaMask with your registered hospital account to access the Hospital Portal.
+        </p>
       </div>
     );
   }
@@ -50,13 +55,17 @@ export default function HospitalPage() {
   if (role !== "Hospital" && role !== "Admin") {
     return (
       <div className="max-w-3xl mx-auto px-6 py-20 text-center space-y-4">
-        <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto" />
-        <h2 className="text-xl font-semibold text-slate-300">Access Restricted</h2>
-        <p className="text-slate-400 text-sm">
+        <div className="w-16 h-16 rounded-3xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto border border-amber-200">
+          <AlertTriangle className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-800">Access Restricted</h2>
+        <p className="text-slate-600 text-sm max-w-md mx-auto leading-relaxed">
           This portal is only accessible to registered hospitals (HOSPITAL_ROLE).
           Ask the contract admin to register your wallet address.
         </p>
-        <p className="text-xs font-mono text-slate-500">Connected: {account}</p>
+        <p className="text-xs font-mono text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg inline-block">
+          Connected: {account}
+        </p>
       </div>
     );
   }

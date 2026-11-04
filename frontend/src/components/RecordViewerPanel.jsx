@@ -313,7 +313,7 @@ export default function RecordViewerPanel({ privateKey, isHospitalRegistered }) 
 
       // ── Step f: Recompute SHA-256 hash & verifyRecord on-chain ──────────────
       setStatus("confirming", "🔍 [Step 6/6] Recomputing SHA-256 hash of original file & verifying against blockchain…");
-      const recomputedHash = await computeFileHash(decryptedBytes.buffer);
+      const recomputedHash = await computeFileHash(decryptedBytes);
       const isVerified = await contract.verifyRecord(record.id, recomputedHash);
 
       const mimeInfo = detectMimeType(decryptedBytes);
